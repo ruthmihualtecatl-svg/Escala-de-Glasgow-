@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f3">
+  <title>Escala de Glasgow | Evaluación</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #192d32;
+      --muted: #607277;
+      --paper: #f5f7f3;
+      --surface: #ffffff;
+      --line: #dce5e1;
+      --teal: #087e75;
+      --teal-soft: #e1f3ed;
+      --amber: #a55a09;
+      --amber-soft: #fff0d4;
+      --coral: #b33c32;
+      --coral-soft: #fde5df;
+      --shadow: 0 16px 40px rgb(25 45 50 / 7%);
+      font-family: "Aptos", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 8% 2%, rgb(8 126 117 / 9%), transparent 27rem),
+        linear-gradient(145deg, #f8faf7, var(--paper) 55%, #eef4f0);
+      color: var(--ink);
+    }
+
+    button, input { font: inherit; }
+
+    .shell {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 44px 0 56px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(34px, 5vw, 52px);
+      font-weight: 500;
+      line-height: 1.05;
+    }
+
+    .intro {
+      max-width: 570px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .reset {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .reset:hover { border-color: var(--teal); color: var(--teal); }
+    .reset:focus-visible, .choice:focus-within { outline: 3px solid #69bdb1; outline-offset: 2px; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      align-items: start;
+      gap: 20px;
+    }
+
+    .sections { display: grid; gap: 14px; }
+
+    .scale-section {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      box-shadow: 0 5px 18px rgb(25 45 50 / 3%);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfa;
+    }
+
+    .section-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 5px;
+      background: var(--teal-soft);
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .section-heading h2 { margin: 0; font-size: 17px; }
+    .section-heading p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+
+    .choices { display: grid; padding: 5px 18px 10px; }
+
+    .choice {
+      position: relative;
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr) 36px;
+      align-items: center;
+      gap: 11px;
+      min-height: 45px;
+      padding: 7px 9px;
+      border-bottom: 1px solid #edf1ef;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 140ms ease;
+    }
+
+    .choice:last-child { border-bottom: 0; }
+    .choice:hover { background: #f3f8f5; }
+
+    .choice input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--teal);
+    }
+
+    .choice-text { font-size: 14px; line-height: 1.35; }
+
+    .score {
+      display: grid;
+      width: 34px;
+      height: 30px;
+      place-items: center;
+      border-radius: 4px;
+      background: #edf2ef;
+      color: #40565a;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .choice:has(input:checked) {
+      background: var(--teal-soft);
+      color: #075f58;
+    }
+
+    .choice:has(input:checked) .score { background: var(--teal); color: white; }
+
+    .result {
+      position: sticky;
+      top: 18px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .result-label {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .total-row { display: flex; align-items: baseline; gap: 7px; }
+    .total { font-family: Georgia, "Times New Roman", serif; font-size: 64px; line-height: 1; }
+    .out-of { color: var(--muted); font-size: 15px; }
+
+    .status {
+      display: block;
+      margin-top: 16px;
+      padding: 11px 12px;
+      border-radius: 4px;
+      background: #edf2ef;
+      color: #40565a;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .status.mild { background: var(--teal-soft); color: #075f58; }
+    .status.moderate { background: var(--amber-soft); color: #824400; }
+    .status.severe { background: var(--coral-soft); color: #922d25; }
+
+    .breakdown {
+      display: grid;
+      gap: 10px;
+      margin: 19px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .breakdown li { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 13px; }
+    .breakdown strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+    .hint { margin: 17px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .notice {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--amber);
+      border-radius: 0 4px 4px 0;
+      background: #fff8eb;
+      color: #684517;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 28px, 560px); padding-top: 28px; }
+      header { align-items: flex-start; }
+      .layout { grid-template-columns: 1fr; }
+      .result { position: static; grid-row: 1; }
+      .total { font-size: 52px; }
+    }
+
+    @media (max-width: 460px) {
+      header { flex-direction: column; gap: 16px; }
+      .reset { align-self: flex-end; }
+      .section-heading { padding-inline: 13px; }
+      .choices { padding-inline: 9px; }
+      .choice { grid-template-columns: 20px minmax(0, 1fr) 34px; gap: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">Evaluación neurológica</p>
+        <h1>Escala de Glasgow</h1>
+        <p class="intro">Selecciona la mejor respuesta observada en cada componente para obtener el puntaje total.</p>
+      </div>
+      <button class="reset" id="reset" type="button" title="Borrar todas las respuestas">
+        <span aria-hidden="true">↺</span> Reiniciar
+      </button>
+    </header>
+
+    <div class="layout">
+      <div class="sections" aria-label="Componentes de la escala">
+        <section class="scale-section" aria-labelledby="ocular-title">
+          <div class="section-heading">
+            <span class="section-mark" aria-hidden="true">O</span>
+            <div><h2 id="ocular-title">Respuesta ocular</h2><p>Selecciona una respuesta</p></div>
+          </div>
+          <div class="choices" role="radiogroup" aria-labelledby="ocular-title">
+            <label class="choice"><input type="radio" name="ocular" value="4"><span class="choice-text">Espontánea</span><span class="score">4</span></label>
+            <label class="choice"><input type="radio" name="ocular" value="3"><span class="choice-text">A la orden verbal</span><span class="score">3</span></label>
+            <label class="choice"><input type="radio" name="ocular" value="2"><span class="choice-text">Al estímulo doloroso</span><span class="score">2</span></label>
+            <label class="choice"><input type="radio" name="ocular" value="1"><span class="choice-text">Ninguna respuesta</span><span class="score">1</span></label>
+          </div>
+        </section>
+
+        <section class="scale-section" aria-labelledby="verbal-title">
+          <div class="section-heading">
+            <span class="section-mark" aria-hidden="true">V</span>
+            <div><h2 id="verbal-title">Respuesta verbal</h2><p>Selecciona una respuesta</p></div>
+          </div>
+          <div class="choices" role="radiogroup" aria-labelledby="verbal-title">
+            <label class="choice"><input type="radio" name="verbal" value="5"><span class="choice-text">Orientado y conversando</span><span class="score">5</span></label>
+            <label class="choice"><input type="radio" name="verbal" value="4"><span class="choice-text">Desorientado y hablando</span><span class="score">4</span></label>
+            <label class="choice"><input type="radio" name="verbal" value="3"><span class="choice-text">Palabras inapropiadas</span><span class="score">3</span></label>
+            <label class="choice"><input type="radio" name="verbal" value="2"><span class="choice-text">Sonidos incomprensibles</span><span class="score">2</span></label>
+            <label class="choice"><input type="radio" name="verbal" value="1"><span class="choice-text">Ninguna respuesta</span><span class="score">1</span></label>
+          </div>
+        </section>
+
+        <section class="scale-section" aria-labelledby="motora-title">
+          <div class="section-heading">
+            <span class="section-mark" aria-hidden="true">M</span>
+            <div><h2 id="motora-title">Respuesta motora</h2><p>Selecciona una respuesta</p></div>
+          </div>
+          <div class="choices" role="radiogroup" aria-labelledby="motora-title">
+            <label class="choice"><input type="radio" name="motora" value="6"><span class="choice-text">Obedece órdenes verbales</span><span class="score">6</span></label>
+            <label class="choice"><input type="radio" name="motora" value="5"><span class="choice-text">Localiza el dolor</span><span class="score">5</span></label>
+            <label class="choice"><input type="radio" name="motora" value="4"><span class="choice-text">Retirada ante el dolor</span><span class="score">4</span></label>
+            <label class="choice"><input type="radio" name="motora" value="3"><span class="choice-text">Flexión anormal ante el dolor</span><span class="score">3</span></label>
+            <label class="choice"><input type="radio" name="motora" value="2"><span class="choice-text">Extensión ante el dolor</span><span class="score">2</span></label>
+            <label class="choice"><input type="radio" name="motora" value="1"><span class="choice-text">Ninguna respuesta</span><span class="score">1</span></label>
+          </div>
+        </section>
+      </div>
+
+      <aside class="result" aria-live="polite" aria-atomic="true">
+        <p class="result-label">Puntaje total</p>
+        <div class="total-row"><span class="total" id="total">--</span><span class="out-of">/ 15</span></div>
+        <span class="status" id="status">Completa los tres componentes</span>
+        <ul class="breakdown" aria-label="Puntajes por componente">
+          <li><span>Ocular</span><strong id="ocular-score">-- / 4</strong></li>
+          <li><span>Verbal</span><strong id="verbal-score">-- / 5</strong></li>
+          <li><span>Motora</span><strong id="motora-score">-- / 6</strong></li>
+        </ul>
+        <p class="hint">Rango total: 3 a 15 puntos. La interpretación se muestra cuando se han seleccionado los tres componentes.</p>
+      </aside>
+    </div>
+
+    <div class="notice"><strong>Uso orientativo:</strong> esta herramienta no sustituye la valoración de un profesional de salud. Ante una alteración del estado de conciencia, busca atención médica urgente.</div>
+  </main>
+
+  <script>
+    const componentNames = ["ocular", "verbal", "motora"];
+    const totalOutput = document.querySelector("#total");
+    const statusOutput = document.querySelector("#status");
+
+    function updateResult() {
+      const scores = componentNames.map((name) => {
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        return selected ? Number(selected.value) : null;
+      });
+
+      componentNames.forEach((name, index) => {
+        document.querySelector(`#${name}-score`).textContent = scores[index] === null
+          ? `-- / ${name === "ocular" ? 4 : name === "verbal" ? 5 : 6}`
+          : `${scores[index]} / ${name === "ocular" ? 4 : name === "verbal" ? 5 : 6}`;
+      });
+
+      const complete = scores.every((score) => score !== null);
+      const total = complete ? scores.reduce((sum, score) => sum + score, 0) : null;
+      totalOutput.textContent = total ?? "--";
+      statusOutput.className = "status";
+
+      if (!complete) {
+        statusOutput.textContent = "Completa los tres componentes";
+      } else if (total >= 13) {
+        statusOutput.textContent = "Leve · 13–15 puntos";
+        statusOutput.classList.add("mild");
+      } else if (total >= 9) {
+        statusOutput.textContent = "Moderado · 9–12 puntos";
+        statusOutput.classList.add("moderate");
+      } else {
+        statusOutput.textContent = "Grave · 3–8 puntos";
+        statusOutput.classList.add("severe");
+      }
+    }
+
+    document.querySelectorAll('input[type="radio"]').forEach((input) => {
+      input.addEventListener("change", updateResult);
+    });
+
+    document.querySelector("#reset").addEventListener("click", () => {
+      document.querySelectorAll('input[type="radio"]:checked').forEach((input) => {
+        input.checked = false;
+      });
+      updateResult();
+    });
+  </script>
+</body>
+</html>
